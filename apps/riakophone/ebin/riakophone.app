@@ -1,0 +1,9 @@
+{application,riakophone,
+             [{description,[]},
+              {vsn,"1"},
+              {registered,[]},
+              {applications,[kernel,stdlib,riak_core]},
+              {mod,{riakophone_app,[]}},
+              {env,[]},
+              {modules,[riakophone,riakophone_app,riakophone_midi,
+                        riakophone_sup,riakophone_utils,riakophone_vnode]}]}.

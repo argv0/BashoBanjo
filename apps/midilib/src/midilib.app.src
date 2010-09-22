@@ -1,0 +1,12 @@
+{application, midilib,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { midilib_app, []}},
+  {env, []}
+ ]}.

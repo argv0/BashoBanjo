@@ -1,0 +1,6 @@
+-define(PRINT(Var), io:format("DEBUG: ~p:~p - ~p~n~n ~p~n~n", [?MODULE, ?LINE, ??Var, Var])).
+-define(SAMPLERATE, 16000).
+-define(CHANNELS, 1).
+-record(on, {ticks, controller, note, amplitude}).
+-record(off, {ticks, controller, note, amplitude}).
+-record(note, {start, length, controller, note, amplitude}).
