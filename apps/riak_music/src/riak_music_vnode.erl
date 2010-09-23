@@ -14,9 +14,9 @@
 
 %% Copyright (c) 2007-2010 Basho Technologies, Inc.  All Rights Reserved.
 
--module(riakophone_vnode).
+-module(riak_music_vnode).
 -behaviour(riak_core_vnode).
--include("riakophone.hrl").
+-include("riak_music.hrl").
 
 -export([start_vnode/1,
          init/1,
@@ -39,10 +39,11 @@ start_vnode(I) ->
 
 init([Partition]) ->
     %% TODO: Test for various methods of playing sounds.
-    Method = riakophone_utils:detect_audio_method(),
+    Method = riak_music_utils:detect_audio_method(),
     {ok, #state { partition=Partition, method=Method }}.
 
-handle_command({play, _Controller, MidiNote, Amplitude, Duration}, _Sender, State) ->
+handle_command(Msg = {play, _Controller, MidiNote, Amplitude, Duration}, _Sender, State) ->
+    ?PRINT(Msg),
     play(State#state.method, MidiNote, Amplitude, Duration),
     {noreply, State};
 

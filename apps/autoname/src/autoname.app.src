@@ -1,0 +1,14 @@
+{application, autoname,
+ [
+  {description, "Autoname starts net_kernel with a reasonable node name."},
+  {vsn, "0.1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, {autoname_app, []}},
+  {env, [
+         {nodename, autoname}
+        ]}
+ ]}.

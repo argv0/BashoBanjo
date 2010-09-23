@@ -1,5 +1,5 @@
 
--module(riakophone_sup).
+-module(autoname_sup).
 
 -behaviour(supervisor).
 
@@ -24,8 +24,5 @@ start_link() ->
 %% ===================================================================
 
 init([]) ->
-    VMaster = {riakophone_vnode_master, 
-               {riak_core_vnode_master, start_link, [riakophone_vnode]}, 
-               permanent, 5000, worker, [riak_core_vnode_master]},
-    {ok, { {one_for_one, 5, 10}, [VMaster]} }.
+    {ok, { {one_for_one, 5, 10}, []} }.
 

@@ -1,4 +1,4 @@
-{application, riakophone,
+{application, riak_music,
  [
   {description, ""},
   {vsn, "1"},
@@ -8,6 +8,6 @@
                   stdlib,
                   riak_core                  
                  ]},
-  {mod, { riakophone_app, []}},
+  {mod, { riak_music_app, []}},
   {env, []}
  ]}.

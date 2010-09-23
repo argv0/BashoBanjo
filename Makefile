@@ -13,7 +13,7 @@ clean:
 distclean: clean devclean relclean ballclean
 	./rebar delete-deps
 
-run: all
+run: compile 
 	erl \
 	-name phone1@127.0.0.1 \
 	-setcookie phone \
@@ -23,17 +23,13 @@ run: all
 	-eval "application:start(crypto)" \
 	-eval "application:start(webmachine)" \
 	-eval "application:start(riak_core)" \
-	-eval "application:start(riakophone)"
+	-eval "application:start(riak_music)"
 
-run2: all
-	erl \
-	-name `whoami`@127.0.0.1 \
-	-setcookie phone \
-	-pa deps/*/ebin \
-	-pa apps/*/ebin \
-	-eval "application:start(sasl)" \
-	-eval "application:start(crypto)" \
-	-eval "application:start(webmachine)" \
-	-eval "application:start(riak_core)" \
-	-eval "application:start(riakophone)" \
-	-eval "riak_core_gossip:send_ring('phone1@127.0.0.1', node())"
+rel:
+	./rebar compile generate
+	chmod 755 rel/basho_banjo/bin/banjo
+
+rellink:
+	$(foreach app,$(wildcard apps/*), rm -rf rel/basho_banjo/lib/$(shell basename $(app))* && ln -sf $(abspath $(app)) rel/basho_banjo/lib;)
+	$(foreach dep,$(wildcard deps/*), rm -rf rel/basho_banjo/lib/$(shell basename $(dep))* && ln -sf $(abspath $(dep)) rel/basho_banjo/lib;)
+

@@ -1,8 +1,16 @@
--module(riakophone_midi).
--export([read/1]).
--include("riakophone.hrl").
+-module(riak_music_midi).
+-export([play/2, stop/1]).
+-include("riak_music.hrl").
 
-read(Filename) ->
+play(Filename, Callback) ->
+    {ok, Notes, MSPerTick} = read_midi(Filename),
+    Pid = spawn(fun() -> play_notes(Notes, MSPerTick, 0, Callback) end),
+    {ok, Pid}.
+
+stop(Pid) ->
+    Pid ! stop.
+
+read_midi(Filename) ->
     {seq, {header, _, Time}, GlobalTrack, Tracks} = midifile:read(Filename),
     case <<Time:16/integer>> of
         <<0:1/integer, TicksPerBeat:15/integer>> ->
@@ -14,6 +22,8 @@ read(Filename) ->
     MSPerTick = calculate_ms_per_tick(TicksPerBeat, GlobalTrack),
     Notes = transform_tracks([GlobalTrack|Tracks]),
     {ok, Notes, MSPerTick}.
+
+
 
 calculate_ms_per_tick(TicksPerBeat, {track, TrackInfo}) ->
     {tempo, _, [MicroSecPerQuarterNote]} = lists:keyfind(tempo, 1, TrackInfo),
@@ -63,4 +73,28 @@ transform_events3([_|Rest]) ->
 transform_events3([]) ->
     [].
 
+play_notes([Note|Notes], MSPerTick, Ticks, Callback) ->
+    %% Delay the proper amount of ticks...
+    case Ticks < Note#note.start of
+        true ->
+            Sleep = trunc(MSPerTick * (Note#note.start - Ticks)),
+            timer:sleep(Sleep);
+        false ->
+            ok
+    end,
 
+    %% Play the next note...
+    Controller = Note#note.controller,
+    MidiNote = Note#note.note,
+    Amplitude = Note#note.amplitude,
+    Duration = (MSPerTick * Note#note.length) / 1000,
+    Callback(Controller, MidiNote, Amplitude, Duration),
+
+    %% Check if we have been stopped...
+    receive stop -> 
+            stopped
+    after 0 ->
+            play_notes(Notes, MSPerTick, Note#note.start, Callback)
+    end;
+play_notes([], _, _, _) -> 
+    ok.

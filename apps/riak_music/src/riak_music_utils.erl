@@ -1,4 +1,4 @@
--module(riakophone_utils).
+-module(riak_music_utils).
 -export([detect_audio_method/0]).
 
 detect_audio_method() ->
