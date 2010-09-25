@@ -10,6 +10,11 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
+    %% Ensure epmd is started...
+    io:format("Ensuring epmd is started...~n"),
+    os:cmd("epmd -daemon"),
+    timer:sleep(2000),
+
     %% Create the name...
     {ok, NodeName} = application:get_env(autoname, nodename),
 

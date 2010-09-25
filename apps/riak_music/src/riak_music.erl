@@ -8,6 +8,14 @@
 
 -include("riak_music.hrl").
 
+%% Some songs:
+
+%% Scale: 
+%%    [begin play(Note), timer:sleep(400) end|| Note <- [60, 62, 64, 65, 67, 69,71, 72]].
+
+%% Old Macdonald: 
+%%    [begin play(Note), timer:sleep(500) end|| Note <- [70, 70, 70, 65, 67, 67, 65, 0, 74, 74, 72, 72, 70]].
+
 join() ->
     riak_core_gossip:send_ring('rphone1@192.168.1.137', node()).
 
@@ -27,7 +35,7 @@ play(Filename) when is_list(Filename)->
 
 %% Play the specified midi note.
 play(MidiNote) when is_integer(MidiNote) ->
-    play_note(1, MidiNote, 1, 1).
+    play_note(1, MidiNote, 1, 0.5).
 
 stop() ->
     case erlang:get(playing_pids) of
