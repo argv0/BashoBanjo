@@ -29,9 +29,10 @@
          handoff_cancelled/1,
          handoff_finished/2,
          handle_handoff_data/2,
-         encode_handoff_item/2]).
+         encode_handoff_item/2,
+         generate_au/3]).
 
--record(state, {partition, method}).
+-record(state, {partition, method, ports}).
 
 %% API
 start_vnode(I) ->
@@ -40,7 +41,8 @@ start_vnode(I) ->
 init([Partition]) ->
     %% TODO: Test for various methods of playing sounds.
     Method = riak_music_utils:detect_audio_method(),
-    {ok, #state { partition=Partition, method=Method }}.
+    Ports = [new_sound_port() || _ <- lists:seq(1, ?NUM_SOUND_PORTS)],
+    {ok, #state { partition=Partition, method=Method, ports=Ports }}.
 
 handle_command({play, _Controller, MidiNote, Amplitude, Duration}, _Sender, State) ->
     %% Print out the note...
@@ -54,8 +56,9 @@ handle_command({play, _Controller, MidiNote, Amplitude, Duration}, _Sender, Stat
     io:format(String),
     
     %% Play the note...
-    play(State#state.method, MidiNote, Amplitude, Duration),
-    {noreply, State};
+    Ports = State#state.ports,
+    NewPorts = play(State#state.method, MidiNote, Amplitude, Duration, Ports),
+    {noreply, State#state { ports=NewPorts }};
 
 handle_command(Message, _Sender, State) ->
     ?PRINT({unhandled_command, Message}),
@@ -92,7 +95,11 @@ terminate(_Reason, _State) ->
 
 %% PRIVATE FUNCTIONS
 
-play(Method, MidiNote, Amplitude, Duration) ->
+new_sound_port() ->
+    erlang:open_port({spawn, "sh"}, [stream, out]).
+
+play(Method, MidiNote, Amplitude, Duration, Ports) ->
+    %% Generate the sound file...
     Filename = lists:flatten(io_lib:format("./notes/note_~w_~w_~w.au", [MidiNote, Duration, Amplitude])),
     case filelib:is_regular(Filename) of
         true ->
@@ -102,10 +109,31 @@ play(Method, MidiNote, Amplitude, Duration) ->
             filelib:ensure_dir(Filename),
             file:write_file(Filename, Data)
     end,
-    play(Method, Filename).
 
-play(afplay, Filename) ->
-    spawn(fun() -> os:cmd("afplay " ++ Filename) end).
+    %% Generate the play command...
+    PlayCmd = get_play_command(Method, Filename),
+    send_play_command(PlayCmd, Ports).
+
+%% Send the play command to the first port. If it's down, re-open it.
+send_play_command(PlayCmd, [Port|Ports]) ->
+    try
+        true = erlang:port_command(Port, PlayCmd),
+        Ports ++ [Port]
+    catch _ : _ ->
+        NewPort = new_sound_port(),
+        true = erlang:port_command(NewPort, PlayCmd),
+        Ports ++ [NewPort]
+    end.
+
+
+%% Generate the sh command to play an audio file.
+get_play_command(afplay, Filename) ->
+    "afplay " ++ Filename ++ "\n";
+get_play_command(aplay, Filename) ->
+    "aplay -q " ++ Filename ++ "\n";
+get_play_command(Unknown, _) ->
+    ?PRINT({unknown_audio_method, Unknown}),
+    "".
 
 
 %% Return the bytes for an .au file of the requested duration,

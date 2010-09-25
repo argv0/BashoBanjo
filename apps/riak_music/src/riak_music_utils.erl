@@ -3,15 +3,12 @@
 
 detect_audio_method() ->
     AFPlayExists = filelib:wildcard("/usr/bin/afplay") /= [],
-    SoundDeviceExists = filelib:wildcard("/dev/sound") /= [],
-    AudioDeviceExists = filelib:wildcard("/dev/audio") /= [],
+    APlayExists = filelib:wildcard("/usr/bin/aplay") /= [],
     if 
         AFPlayExists -> 
             afplay;
-        SoundDeviceExists -> 
-            sound_device;
-        AudioDeviceExists -> 
-            audio_device;
+        APlayExists -> 
+            aplay;
         true -> 
             undefined
     end.
