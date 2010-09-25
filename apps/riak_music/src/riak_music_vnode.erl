@@ -42,8 +42,18 @@ init([Partition]) ->
     Method = riak_music_utils:detect_audio_method(),
     {ok, #state { partition=Partition, method=Method }}.
 
-handle_command(Msg = {play, _Controller, MidiNote, Amplitude, Duration}, _Sender, State) ->
-    ?PRINT(Msg),
+handle_command({play, _Controller, MidiNote, Amplitude, Duration}, _Sender, State) ->
+    %% Print out the note...
+    if
+        Duration < 0.1 -> Note = [9834];
+        Duration < 0.4 -> Note = [9833];
+        true -> Note = [9835]
+    end,
+    Offset = lists:max([(MidiNote - 40) * 2, 0]),
+    String = lists:flatten([string:copies(" ", Offset), Note, "\n"]),
+    io:format(String),
+    
+    %% Play the note...
     play(State#state.method, MidiNote, Amplitude, Duration),
     {noreply, State};
 
