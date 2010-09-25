@@ -2,8 +2,7 @@
 -export([
          play/1,
          stop/0, 
-         stop/1,
-         join/0
+         stop/1
         ]).
 
 -include("riak_music.hrl").
@@ -15,9 +14,6 @@
 
 %% Old Macdonald: 
 %%    [begin play(Note), timer:sleep(500) end|| Note <- [70, 70, 70, 65, 67, 67, 65, 0, 74, 74, 72, 72, 70]].
-
-join() ->
-    riak_core_gossip:send_ring('rphone1@192.168.1.137', node()).
 
 %% Play the supplied filename.
 play(Filename) when is_list(Filename)->
