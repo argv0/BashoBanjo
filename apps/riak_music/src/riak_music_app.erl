@@ -36,7 +36,7 @@ start(_StartType, _StartArgs) ->
             %% %% the command line, and it really only needs to be done
             %% %% once, not every time you start the application.
             {ok, AutoJoinNode} = application:get_env(riak_music, auto_join),
-            riak_core_gossip:send_ring(node(), AutoJoinNode),
+            riak_core_gossip:send_ring(AutoJoinNode, node()),
 
             {ok, Pid};
         {error, Reason} ->
