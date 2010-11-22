@@ -69,6 +69,5 @@ If you want to run multiple nodes on a single computer, you can:
 2. Edit `etc/vm.args` and change the node name to something like `banjo1@127.0.0.`
 3. Edit `etc/app.config` and change the handoff port to avoid a port conflict.
 4. Start the new node.
-5. Join the new node to the existing node:
-
-    join('banjo1@hostname').
+5. Join the new node to the existing node from the Erlang console: `join('banjo1@hostname').`
+6. Then, play a midi tune, which should play across both nodes: `play("../../midi/mario.mid").`
