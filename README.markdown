@@ -1,7 +1,7 @@
 # What is Basho Banjo?
 
 Basho Banjo is an experiment in using Riak Core to create a
-distributed orchistra powered by midi files. It serves as a simple
+distributed orchestra powered by midi files. It serves as a simple
 example of how to create a distributed application with Riak Core.
 
 # How Does it Work?
@@ -9,7 +9,7 @@ example of how to create a distributed application with Riak Core.
 To understand 'Banjo, you first need to understand a little about Riak
 Core. Riak Core is an open-source Erlang library that allows you to
 create masterless distributed applications using the principles
-described in Amazon's Dynamo Paper. For more information about Riak
+described in [Amazon's Dynamo Paper](http://www.allthingsdistributed.com/2007/10/amazons_dynamo.html). For more information about Riak
 Core, you can view [this
 presentation](http://www.slideshare.net/rklophaus/masterless-distributed-computing-with-riak-core-euc-2010).
 
