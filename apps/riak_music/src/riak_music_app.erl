@@ -24,20 +24,6 @@ start(_StartType, _StartArgs) ->
             %% Register our vnode module with Riak Core.
             riak_core:register_vnode_module(riak_music_vnode),
             riak_core_node_watcher:service_up(riak_music, self()),
-
-            %% Add webmachine route to reflect an IP address. This
-            %% should technically be in autoname, but it has to happen
-            %% here because we need to start it after Riak Core starts...
-            Route = {["ip"], autoname_wm_ipaddress, []},
-            webmachine_router:add_route(Route),
-
-            %% %% Automatically join to the cluster. This is here for
-            %% %% demonstration purposes, normally this would be done on
-            %% %% the command line, and it really only needs to be done
-            %% %% once, not every time you start the application.
-            {ok, AutoJoinNode} = application:get_env(riak_music, auto_join),
-            riak_core_gossip:send_ring(AutoJoinNode, node()),
-
             {ok, Pid};
         {error, Reason} ->
             {error, Reason}

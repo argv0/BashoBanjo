@@ -19,6 +19,9 @@ local_allowed(_,_,State) ->
 non_local_allowed({sync, go}, [], State) ->
     {true, State};
 
+non_local_allowed({erlang, nodes}, [], State) ->
+    {true, State};
+
 non_local_allowed(_,_,State) ->
     {false, State}.
 
